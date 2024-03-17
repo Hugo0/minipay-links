@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { peanut } from '@squirrel-labs/peanut-sdk';
 
 export default function Home() {
-	const { address, getUserAddress, sendCUSD, mintMinipayNFT, getNFTs, signTransaction } = useWeb3();
+	const { address, getUserAddress, sendCUSD, mintMinipayNFT, getNFTs, signTransaction, createPayLink } = useWeb3();
 	const [cUSDLoading, setCUSDLoading] = useState(false);
 	const [nftLoading, setNFTLoading] = useState(false);
 	const [signingLoading, setSigningLoading] = useState(false);
@@ -70,7 +70,6 @@ export default function Home() {
 		<div className="flex flex-col justify-center items-center">
 			{!address && <div className="h1">Please install Metamask and connect.</div>}
 			<div className="h1">Peanut SDK Version: {peanut.VERSION}</div>
-			{address && <div className="h1">There you go... a canvas for your next Minipay project! PEANUT</div>}
 
 			{address && (
 				<>
@@ -79,34 +78,27 @@ export default function Home() {
 					</div>
 					{tx && (
 						<p className="font-bold mt-4">
-							Tx Completed: {(tx.hash as string).substring(0, 6)}
+							Tx Completed: {tx.hash as string}
 							...
-							{(tx.hash as string).substring(tx.hash.length - 6, tx.hash.length)}
+							{tx.hash as string}
 						</p>
 					)}
-					<div className="w-full px-3 mt-7">
-						<PrimaryButton
-							loading={signingLoading}
-							onClick={sendingCUSD}
-							title="Send 0.1 cUSD to your own address"
-							widthFull
-						/>
-					</div>
 
 					<div className="w-full px-3 mt-7">
 						<PrimaryButton
 							loading={signingLoading}
-							onClick={sendingCUSD}
+							onClick={createPayLink}
 							title="Create payLink"
 							widthFull
 						/>
 					</div>
 
-					<div className="w-full px-3 mt-6">
-						<PrimaryButton loading={cUSDLoading} onClick={signMessage} title="Sign a Message" widthFull />
+					{/* Big Divider */}
+					<div className="w-full my-8">
+						<hr className="border-2 border-yellow-500 my-32" />
 					</div>
 
-					{userOwnedNFTs.length > 0 ? (
+					{/* {userOwnedNFTs.length > 0 ? (
 						<div className="flex flex-col items-center justify-center w-full mt-7">
 							<p className="font-bold">My NFTs</p>
 							<div className="w-full grid grid-cols-2 gap-3 mt-3 px-2">
@@ -125,10 +117,23 @@ export default function Home() {
 						</div>
 					) : (
 						<div className="mt-5">You do not have any NFTs yet</div>
-					)}
+					)} */}
 
-					<div className="w-full px-3 mt-5">
+					{/* <div className="w-full px-3 mt-5">
 						<PrimaryButton loading={nftLoading} onClick={mintNFT} title="Mint Minipay NFT" widthFull />
+					</div> */}
+
+					<div className="w-full px-3 mt-7">
+						<PrimaryButton
+							loading={signingLoading}
+							onClick={sendingCUSD}
+							title="Send 0.1 cUSD to your own address"
+							widthFull
+						/>
+					</div>
+
+					<div className="w-full px-3 mt-6">
+						<PrimaryButton loading={cUSDLoading} onClick={signMessage} title="Sign a Message" widthFull />
 					</div>
 				</>
 			)}

@@ -1750,10 +1750,10 @@
   resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.18.0.tgz#8e77a02a09ecce957255a2f48c9a7178ec191908"
   integrity sha512-yfORGUIPgLck41qyN7nbwJRAx17/jAIXCTanHOJZhB6PJ1iAk/84b/xlsVKFSyNyLXIj0dhppoE0+CRws7wlzA==
 
-"@squirrel-labs/peanut-sdk@^0.4.15":
-  version "0.4.15"
-  resolved "https://registry.yarnpkg.com/@squirrel-labs/peanut-sdk/-/peanut-sdk-0.4.15.tgz#09be96ab3a37490769245c705cf42df2210e3927"
-  integrity sha512-d/YM29QdkfG0Nyn0w3EtN3I7kGAldMtdIcoEQoYyavk8UoQxqgJ8GArrNOFjn/C25jrnz7rtzVEQUkbi1o0lMA==
+"@squirrel-labs/peanut-sdk@^0.4.17":
+  version "0.4.17"
+  resolved "https://registry.yarnpkg.com/@squirrel-labs/peanut-sdk/-/peanut-sdk-0.4.17.tgz#75bd898e60c307e45f1a5c09252677addb708b64"
+  integrity sha512-LXmW+QaYfFnlpggvglbiNCs8QECvVBsBOzkKPcTlpZYlFU6me0Z0L5SH2OF3rpRvj39ebWFtd+4hi8f6F5HzuQ==
   dependencies:
     ethersv5 "npm:ethers@^5"
 
