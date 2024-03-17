@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import QRCode from 'qrcode.react'; // Import QRCode component correctly
-
 export default function Home() {
 	const {
 		address,
@@ -46,10 +45,23 @@ export default function Home() {
 			className="flex flex-col justify-center items-center p-6"
 			style={{ backgroundColor: 'white', color: 'black' }}
 		>
-			{!address && <div className="text-2xl font-bold">Please install Metamask and connect.</div>}
-			<div className="text-2xl font-bold">Create a payment link!</div>
+			{!address && (
+				<>
+					<div className="text-2xl font-bold">Please install MiniPay and connect.</div>
+					<a
+						href="https://play.google.com/store/apps/details?id=com.opera.mini.native.beta&hl=en&gl=US"
+						className="mt-4 py-2 px-4 bg-yellow-500 text-black font-bold rounded text-md"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Install Minipay
+					</a>
+				</>
+			)}
 			{address && (
 				<>
+					<div className="text-2xl font-bold">Create a payment link!</div>
+
 					<div className="text-center my-6">
 						Your cUSD balance: <span className="font-bold text-lg">${cUSDBalance}</span>
 					</div>
@@ -74,13 +86,11 @@ export default function Home() {
 							</button>
 						</form>
 					)}
-					{/* {isLoading && <div className="mt-6 flex flex-col items-center text-2xl font-bold">CREATING...</div>}{' '} */}
 					{isLoading && (
 						<div className="mt-6 flex flex-col items-center">
 							<div className="brutalist-spinner"></div>
 						</div>
 					)}
-					{/* Display loading message or animation */}
 					{payLink && (
 						<div className="mt-6 flex flex-col items-center">
 							<div className="text-xl font-bold">Your payLink:</div>
@@ -100,6 +110,9 @@ export default function Home() {
 							<div className="mt-4">
 								<QRCode value={payLink} size={256} level={'H'} includeMargin={true} />
 							</div>
+							<a href={payLink} className="text-sm font-bold underline">
+								direct
+							</a>
 						</div>
 					)}
 				</>

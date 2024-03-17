@@ -9,22 +9,26 @@ const ClaimPage = () => {
 	const [cUSDBalance, setCUSDBalance] = useState<string>('0');
 	const [payLink, setPayLink] = useState<string | undefined>(undefined);
 	const [payLinkDetails, setPayLinkDetails] = useState<any | undefined>(undefined);
-
 	useEffect(() => {
 		const fetchData = async () => {
-			await getUserAddress();
-			const balance = await getCUSDBalance();
-			setCUSDBalance(balance);
-
 			// set the pay link to current full url including #
 			const currentPayLink = window.location.href;
 			setPayLink(currentPayLink);
-			const linkDetails = await getLinkDetails({ link: currentPayLink });
-			setPayLinkDetails(linkDetails);
-			console.log('linkDetails', linkDetails);
+			if (currentPayLink.includes('#')) {
+				const linkDetails = await getLinkDetails({ link: currentPayLink });
+				setPayLinkDetails(linkDetails);
+			} else {
+				setPayLinkDetails({ claimed: true, tokenAmount: 0 });
+			}
+			console.log('linkDetails', payLinkDetails);
 		};
 		fetchData();
 	}, []);
+
+	useEffect(() => {
+		getUserAddress();
+		getCUSDBalance().then(setCUSDBalance);
+	}, [address]);
 
 	const handleClaim = async () => {
 		setClaiming(true);
@@ -42,7 +46,7 @@ const ClaimPage = () => {
 
 	if (!address) {
 		return (
-			<div className="p-6 flex flex-col items-center justify-center min-h-screen bg-white text-black">
+			<div className="p-6 flex flex-col items-center justify-center bg-white text-black">
 				<h1 className="text-2xl font-bold">Please install Minipay to claim your money</h1>
 				<a
 					href="https://play.google.com/store/apps/details?id=com.opera.mini.native.beta&hl=en&gl=US"
@@ -63,14 +67,16 @@ const ClaimPage = () => {
 			)}
 			{payLinkDetails && !payLinkDetails.claimed && (
 				<>
-					<h2 className="text-9xl font-bold my-4">{payLinkDetails.tokenAmount}</h2>
-					<p className="text-2xl my-4">
+					<h2 className="text-9xl font-bold mt-6">{payLinkDetails.tokenAmount}</h2>
+					<p className="text-2xl mb-4">
 						{'$'}
 						{payLinkDetails.tokenSymbol}
 					</p>
 				</>
 			)}
-			<p className="text-lg my-4">Your cUSD Balance: {cUSDBalance}</p>
+			<p className="text-lg my-4">
+				Your <a className="font-bold">$cUSD</a> Balance: {cUSDBalance}
+			</p>
 			{payLinkDetails && !payLinkDetails.claimed && (
 				<>
 					{!claimed ? (
