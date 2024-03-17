@@ -1,5 +1,6 @@
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link'; // Added import for Link
 
 // Add a prop to Header for setting the current view
 export default function Header({ setCurrentView }) {
@@ -25,18 +26,20 @@ export default function Header({ setCurrentView }) {
 									<p>LinkPay</p>
 								</div>
 								<div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-									{/* Existing navbar entry */}
-									<a className="inline-flex items-center border-b-2 border-black px-1 pt-1 text-sm font-medium text-gray-900">
+									{/* Updated navbar entry for Send with Link component */}
+									<Link
+										href="/"
+										className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-900 hover:border-black hover:text-black"
+									>
 										Send
-									</a>
-									{/* Updated navbar entry for Claim with onClick handler */}
-									<a
-										href="#"
-										onClick={() => setCurrentView('claim')}
+									</Link>
+									{/* Updated navbar entry for Claim with Link component */}
+									<Link
+										href="/claim"
 										className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-900 hover:border-black hover:text-black"
 									>
 										Claim
-									</a>
+									</Link>
 								</div>
 							</div>
 						</div>
@@ -44,22 +47,29 @@ export default function Header({ setCurrentView }) {
 
 					<Disclosure.Panel className="sm:hidden">
 						<div className="space-y-1 pt-2 pb-4">
+							{/* Updated mobile menu entry for Send with Link component */}
 							<Disclosure.Button
-								as="a"
-								href="#"
-								className="block border-l-4 border-black py-2 pl-3 pr-4 text-base font-medium text-black"
+								as="div"
+								className="block py-2 pl-3 pr-4 text-base font-medium text-black hover:border-black"
 							>
-								Send
+								<Link
+									href="/"
+									className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-black hover:border-black"
+								>
+									Send
+								</Link>
 							</Disclosure.Button>
-							{/* Add here your custom menu elements */}
-							{/* Updated mobile menu entry for Claim with onClick handler */}
+							{/* Updated mobile menu entry for Claim with Link component */}
 							<Disclosure.Button
-								as="a"
-								href="#"
-								onClick={() => setCurrentView('claim')}
-								className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-black hover:border-black"
+								as="div"
+								className="block py-2 pl-3 pr-4 text-base font-medium text-black hover:border-black"
 							>
-								Claim
+								<Link
+									href="/claim"
+									className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-black hover:border-black"
+								>
+									Claim
+								</Link>
 							</Disclosure.Button>
 						</div>
 					</Disclosure.Panel>
