@@ -1,140 +1,107 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import PrimaryButton from '@/components/Button';
 import { useWeb3 } from '@/contexts/useWeb3';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { peanut } from '@squirrel-labs/peanut-sdk';
+import { useEffect, useState, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import QRCode from 'qrcode.react'; // Import QRCode component correctly
 
 export default function Home() {
-	const { address, getUserAddress, sendCUSD, mintMinipayNFT, getNFTs, signTransaction, createPayLink } = useWeb3();
-	const [cUSDLoading, setCUSDLoading] = useState(false);
-	const [nftLoading, setNFTLoading] = useState(false);
-	const [signingLoading, setSigningLoading] = useState(false);
-	const [userOwnedNFTs, setUserOwnedNFTs] = useState<string[]>([]);
+	const {
+		address,
+		payLink,
+		getUserAddress,
+		createPayLink,
+		getCUSDBalance,
+		isLoading, // Destructure isLoading
+	} = useWeb3();
 	const [tx, setTx] = useState<any>(undefined);
+	const [cUSDBalance, setCUSDBalance] = useState<string>('0');
+	const { register, handleSubmit, watch, setValue } = useForm();
+	const payLinkAmount = watch('payLinkAmount');
 
 	useEffect(() => {
-		getUserAddress();
-	}, []);
+		getUserAddress().then(() => {
+			getCUSDBalance().then(setCUSDBalance);
+		});
+	}, [address, getUserAddress, getCUSDBalance]);
 
-	useEffect(() => {
-		const getData = async () => {
-			const tokenURIs = await getNFTs();
-			setUserOwnedNFTs(tokenURIs);
-		};
-		if (address) {
-			getData();
-		}
-	}, [address]);
-
-	async function sendingCUSD() {
-		if (address) {
-			setSigningLoading(true);
-			try {
-				const tx = await sendCUSD(address, '0.1');
-				setTx(tx);
-			} catch (error) {
-				console.log(error);
-			} finally {
-				setSigningLoading(false);
+	const onSubmit = useCallback(
+		async (data: any) => {
+			const { payLinkAmount } = data;
+			if (payLinkAmount) {
+				await createPayLink(payLinkAmount);
 			}
-		}
-	}
+		},
+		[createPayLink]
+	);
 
-	async function signMessage() {
-		setCUSDLoading(true);
-		try {
-			await signTransaction();
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setCUSDLoading(false);
-		}
-	}
-
-	async function mintNFT() {
-		setNFTLoading(true);
-		try {
-			const tx = await mintMinipayNFT();
-			const tokenURIs = await getNFTs();
-			setUserOwnedNFTs(tokenURIs);
-			setTx(tx);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setNFTLoading(false);
-		}
-	}
+	const copyToClipboard = (link: string) => {
+		navigator.clipboard.writeText(link).then(() => {
+			// Optionally, you can display a message confirming the link was copied.
+		});
+	};
 
 	return (
-		<div className="flex flex-col justify-center items-center">
-			{!address && <div className="h1">Please install Metamask and connect.</div>}
-			<div className="h1">Peanut SDK Version: {peanut.VERSION}</div>
-
+		<div
+			className="flex flex-col justify-center items-center p-6"
+			style={{ backgroundColor: 'white', color: 'black' }}
+		>
+			{!address && <div className="text-2xl font-bold">Please install Metamask and connect.</div>}
+			<div className="text-2xl font-bold">Create a payment link!</div>
 			{address && (
 				<>
-					<div className="h2 text-center">
-						Your address: <span className="font-bold text-sm">{address}</span>
+					<div className="text-center my-6">
+						Your cUSD balance: <span className="font-bold text-lg">${cUSDBalance}</span>
 					</div>
-					{tx && (
-						<p className="font-bold mt-4">
-							Tx Completed: {tx.hash as string}
-							...
-							{tx.hash as string}
-						</p>
+					{tx && <p className="font-bold my-6 text-lg">Tx Completed: {tx.hash}</p>}
+					{!payLink && (
+						<form onSubmit={handleSubmit(onSubmit)} className="w-full">
+							<div className="my-6">
+								<label htmlFor="payLinkAmount" className="block text-xl font-bold">
+									Amount for PayLink
+								</label>
+								<input
+									type="text"
+									id="payLinkAmount"
+									{...register('payLinkAmount', { required: true })}
+									className="mt-2 p-3 w-full text-xl border-2 border-black"
+									placeholder="Enter amount"
+									style={{ backgroundColor: 'white', color: 'black' }}
+								/>
+							</div>
+							<button type="submit" className="w-full py-3 text-xl font-bold text-white bg-black">
+								{isLoading ? 'Creating...' : 'Create PayLink'}
+							</button>
+						</form>
 					)}
-
-					<div className="w-full px-3 mt-7">
-						<PrimaryButton
-							loading={signingLoading}
-							onClick={createPayLink}
-							title="Create payLink"
-							widthFull
-						/>
-					</div>
-
-					{/* Big Divider */}
-					<div className="w-full my-8">
-						<hr className="border-2 border-yellow-500 my-32" />
-					</div>
-
-					{/* {userOwnedNFTs.length > 0 ? (
-						<div className="flex flex-col items-center justify-center w-full mt-7">
-							<p className="font-bold">My NFTs</p>
-							<div className="w-full grid grid-cols-2 gap-3 mt-3 px-2">
-								{userOwnedNFTs.map((tokenURI, index) => (
-									<div key={index} className="p-2 border-[3px] border-colors-secondary rounded-xl">
-										<Image
-											alt="MINIPAY NFT"
-											src={tokenURI}
-											className="w-[160px] h-[200px] object-cover"
-											width={160}
-											height={200}
-										/>
-									</div>
-								))}
+					{/* {isLoading && <div className="mt-6 flex flex-col items-center text-2xl font-bold">CREATING...</div>}{' '} */}
+					{isLoading && (
+						<div className="mt-6 flex flex-col items-center">
+							<div className="brutalist-spinner"></div>
+						</div>
+					)}
+					{/* Display loading message or animation */}
+					{payLink && (
+						<div className="mt-6 flex flex-col items-center">
+							<div className="text-xl font-bold">Your payLink:</div>
+							<input
+								type="text"
+								value={payLink}
+								readOnly
+								className="p-3 border-2 border-black text-xl w-full"
+								style={{ backgroundColor: 'white', color: 'black' }}
+							/>
+							<button
+								onClick={() => copyToClipboard(payLink)}
+								className="mt-3 py-3 px-5 bg-yellow-500 font-bold text-black text-lg w-full"
+							>
+								Copy
+							</button>
+							<div className="mt-4">
+								<QRCode value={payLink} size={256} level={'H'} includeMargin={true} />
 							</div>
 						</div>
-					) : (
-						<div className="mt-5">You do not have any NFTs yet</div>
-					)} */}
-
-					{/* <div className="w-full px-3 mt-5">
-						<PrimaryButton loading={nftLoading} onClick={mintNFT} title="Mint Minipay NFT" widthFull />
-					</div> */}
-
-					<div className="w-full px-3 mt-7">
-						<PrimaryButton
-							loading={signingLoading}
-							onClick={sendingCUSD}
-							title="Send 0.1 cUSD to your own address"
-							widthFull
-						/>
-					</div>
-
-					<div className="w-full px-3 mt-6">
-						<PrimaryButton loading={cUSDLoading} onClick={signMessage} title="Sign a Message" widthFull />
-					</div>
+					)}
 				</>
 			)}
 		</div>
